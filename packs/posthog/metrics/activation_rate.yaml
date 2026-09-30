@@ -1,0 +1,9 @@
+metric: activation_rate
+canonical:
+  kind: ratio
+  numerator: activated_users
+  denominator: new_users
+  on_zero_denominator: null
+provenance: human_curated
+aliases: ["activation", "% activated"]
+status: active

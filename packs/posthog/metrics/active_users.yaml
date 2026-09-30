@@ -1,0 +1,10 @@
+metric: active_users
+label: "Active Users"
+owner: "@growth"
+canonical:
+  kind: distinct_count
+  source: ph_events
+  distinct_on: distinct_id
+provenance: human_curated
+aliases: ["DAU", "WAU", "MAU", "active users", "daily active users", "monthly active users"]
+status: active

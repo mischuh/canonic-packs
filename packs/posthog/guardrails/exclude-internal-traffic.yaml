@@ -1,0 +1,7 @@
+id: posthog-exclude-internal-traffic
+applies_to: { source: ph_events }
+kind: mandatory_filter
+filter: "{{internal_user_filter}}"
+severity: warn
+rationale: "Team/internal traffic inflates every usage and activation number if not excluded."
+phase: P1

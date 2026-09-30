@@ -1,0 +1,21 @@
+name: ph_persons
+connection: "{{connection_id}}"
+table: "{{schema}}.{{persons_table}}"
+grain: [team_id, distinct_id]
+description: "One row per (team_id, distinct_id), mapped to person_id and latest properties. Only includes persons with a person profile — see the internal-traffic-caveat knowledge page for the anonymous-user gap."
+
+columns:
+  - { name: team_id,                    type: int,       nullable: false }
+  - { name: distinct_id,                type: string,    nullable: false }
+  - { name: person_id,                  type: string,    nullable: false }
+  - { name: properties,                 type: json,      nullable: true }
+  - { name: person_distinct_id_version, type: int,       nullable: true }
+  - { name: person_version,             type: int,       nullable: true }
+  - { name: created_at,                 type: timestamp, nullable: false }
+
+dimensions:
+  - { name: person_id,   column: person_id }
+  - { name: signup_date, column: created_at, granularity: day }
+
+meta:
+  provenance: human_curated

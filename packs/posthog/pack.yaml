@@ -1,0 +1,63 @@
+pack: posthog
+version: 0.1.0
+description: "PostHog product analytics: events, persons, and core activation metrics."
+homepage: https://posthog.com
+
+variants:
+  - id: postgres
+    label: "PostHog Postgres batch export"
+    mapping: mappings/postgres.yaml
+    connector: postgres
+
+params:
+  - name: connection_id
+    description: "Existing canonic.yaml connection id pointing at the Postgres database PostHog batch-exports into."
+    required: true
+  - name: schema
+    description: "Postgres schema the batch export writes to."
+    default: posthog_exports
+  - name: events_table
+    default: events
+  - name: persons_table
+    default: persons
+  - name: signup_event
+    description: "Event name marking a new signup (used to define new_users)."
+    required: true
+    choose_from:
+      query: >
+        SELECT event AS value, count(*) AS n
+        FROM {{schema}}.{{events_table}}
+        WHERE timestamp > now() - interval '30 days' AND event NOT LIKE '$%'
+        GROUP BY 1 ORDER BY 2 DESC LIMIT 50
+      allow_custom: true
+  - name: activation_event
+    description: "Event name marking product activation (used to define activated_users)."
+    required: true
+    choose_from: { same_as: signup_event }
+  - name: internal_email_domains
+    description: "Company email domain(s), comma separated. Leave empty to skip."
+    default: ""
+    validate: { pattern: '^[A-Za-z0-9.-]+(,[A-Za-z0-9.-]+)*$' }
+  - name: internal_user_filter
+    description: "SQL predicate excluding internal/team traffic, e.g. \"COALESCE(person_properties->>'email', '') NOT LIKE '%@yourcompany.com'\". Coalesce the email: NOT LIKE on a NULL evaluates to NULL and would silently drop anonymous events. The setup flow builds this predicate from a plain domain answer (see internal_email_domains)."
+    default: "TRUE"
+    derive:
+      from: internal_email_domains
+      per_value: "COALESCE(person_properties->>'email', '') NOT LIKE '%@{{value}}'"
+      join: " AND "
+      when_empty: "TRUE"
+
+required_tables:            # validated against the target connection before any file is written
+  - "{{schema}}.{{events_table}}"
+  - "{{schema}}.{{persons_table}}"
+
+provides:
+  semantics: [models/events.yaml, models/persons.yaml]
+  contracts:
+    metrics: [metrics/active_users.yaml, metrics/new_users.yaml, metrics/activated_users.yaml, metrics/activation_rate.yaml]
+    guardrails: [guardrails/exclude-internal-traffic.yaml]
+  knowledge: [knowledge/activation-definition.md, knowledge/internal-traffic-caveat.md]
+
+first_answer:
+  metric: active_users
+  window: 30d

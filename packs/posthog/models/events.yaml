@@ -1,0 +1,34 @@
+name: ph_events
+connection: "{{connection_id}}"
+table: "{{schema}}.{{events_table}}"
+grain: [uuid]
+description: "One row per PostHog event, from the Postgres batch export events model."
+
+columns:
+  - { name: uuid,               type: string,    nullable: false }
+  - { name: event,              type: string,    nullable: false }
+  - { name: properties,         type: json,      nullable: true }
+  - { name: person_properties,  type: json,      nullable: true }
+  - { name: distinct_id,        type: string,    nullable: false }
+  - { name: team_id,            type: int,       nullable: false }
+  - { name: ip,                 type: string,    nullable: true }
+  - { name: timestamp,          type: timestamp, nullable: false }
+
+measures:
+  - name: event_count
+    expr: "count(*)"
+    additivity: additive
+
+dimensions:
+  - { name: event_name, column: event }
+  - { name: distinct_id, column: distinct_id }
+  - { name: team_id,     column: team_id }
+  - { name: event_date,  column: timestamp, granularity: day, label: "Event Date" }
+
+joins:
+  - to: ph_persons
+    on: "ph_events.distinct_id = ph_persons.distinct_id AND ph_events.team_id = ph_persons.team_id"
+    relationship: many_to_one
+
+meta:
+  provenance: human_curated

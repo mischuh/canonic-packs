@@ -1,0 +1,33 @@
+# Variant metadata for "PostHog Postgres batch export" (pack.yaml variants[].mapping).
+#
+# Not templated and not emitted into a project — this file documents which physical
+# schema this variant targets, for maintainers and for anyone diffing a future variant
+# (e.g. a BigQuery/Snowflake batch export) against this one. The actual column lists it
+# describes are declared as the source of truth in models/events.yaml and
+# models/persons.yaml.
+
+source: "PostHog Postgres batch export"
+docs: https://posthog.com/docs/cdp/batch-exports/postgres
+
+tables:
+  events:
+    param: events_table
+    default_name: events
+    grain: [uuid]
+    columns: [uuid, event, properties, person_properties, distinct_id, team_id, ip, timestamp]
+  persons:
+    param: persons_table
+    default_name: persons
+    grain: [team_id, distinct_id]
+    columns:
+      - team_id
+      - distinct_id
+      - person_id
+      - properties
+      - person_distinct_id_version
+      - person_version
+      - created_at
+
+notes:
+  - "Schema is fixed and documented by PostHog (see docs link above) — no speculative columns."
+  - "properties/person_properties are typed json and left opaque in v1 (see knowledge/internal-traffic-caveat.md and the pack README's follow-up notes)."

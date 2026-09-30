@@ -1,0 +1,8 @@
+metric: activated_users
+canonical:
+  kind: distinct_count
+  source: ph_events
+  distinct_on: distinct_id
+  population_filter: "event = '{{activation_event}}'"
+provenance: human_curated
+status: active
