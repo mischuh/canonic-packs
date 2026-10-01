@@ -1,0 +1,19 @@
+name: pr-title-lint
+
+# Squash-merging a PR uses the PR title as the commit message on main. commitlint.yml only
+# checks individual commits on the branch, not the title, so a non-conventional title would
+# otherwise slip through (see canonic's PR #228 for the incident that motivated this).
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  pr-title-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
