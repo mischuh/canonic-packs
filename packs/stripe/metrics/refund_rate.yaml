@@ -1,0 +1,10 @@
+metric: refund_rate
+label: "Refund Rate"
+canonical:
+  kind: ratio
+  numerator: refunded_amount
+  denominator: gross_revenue
+  on_zero_denominator: null
+provenance: human_curated
+aliases: ["refund percentage", "% refunded"]
+status: active

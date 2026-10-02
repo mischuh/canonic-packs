@@ -1,0 +1,9 @@
+metric: new_subscriptions
+label: "New Subscriptions"
+canonical:
+  kind: single
+  source: stripe_subscriptions
+  measure: subscription_count
+provenance: human_curated
+aliases: ["subscription starts", "new subs"]
+status: active

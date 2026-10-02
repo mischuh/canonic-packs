@@ -1,0 +1,10 @@
+metric: net_revenue
+label: "Net Revenue"
+canonical:
+  kind: single
+  source: stripe_charges
+  measure: net_amount
+  population_filter: "status = 'succeeded'"
+provenance: human_curated
+aliases: ["net sales", "revenue after refunds"]
+status: active

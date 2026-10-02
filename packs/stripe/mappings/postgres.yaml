@@ -1,0 +1,34 @@
+# Variant metadata for "Stripe Data Pipeline real-time sync to Postgres" (pack.yaml variants[].mapping).
+#
+# Not templated and not emitted into a project. This file documents which physical
+# schema this variant targets, for maintainers and for anyone diffing a future variant
+# (e.g. the warehouse Data Pipeline for Snowflake or Redshift) against this one.
+# The column lists declared in models/ are a subset of each table, which is legitimate:
+# the remaining columns are mostly JSON and unused by this pack.
+
+source: "Stripe Data Pipeline, real-time sync to Postgres (public preview)"
+docs: https://docs.stripe.com/data/data-pipeline/real-time-sync-to-postgres/schema
+
+tables:
+  charges:
+    param: charges_table
+    default_name: charges
+    grain: [id]
+    columns: [id, _account_id, amount, amount_refunded, currency, customer, status, paid, refunded, disputed, livemode, created]
+  customers:
+    param: customers_table
+    default_name: customers
+    grain: [id]
+    columns: [id, _account_id, created, delinquent, livemode]
+  subscriptions:
+    param: subscriptions_table
+    default_name: subscriptions
+    grain: [id]
+    columns: [id, _account_id, customer, status, currency, cancel_at_period_end, livemode, created, start_date, canceled_at, ended_at]
+
+notes:
+  - "Schema follows the Stripe API (version 2026-03-25.dahlia at the time of writing). Tables map one to one onto API objects."
+  - "Every timestamp column (created, start_date, canceled_at, ended_at) is a bigint of Unix seconds, converted with to_timestamp(...) AT TIME ZONE 'UTC' in the dimensions."
+  - "All money columns are bigint in the currency's smallest unit, divided by the minor_unit_divisor param in the measures."
+  - "Subscription items are inside subscriptions.items (jsonb) and prices.recurring is jsonb, so MRR is not modeled in v1."
+  - "Stripe names the Postgres schema 'stripe' when the pipeline is connected with a connection string, and uses the name given in the advanced setup otherwise."

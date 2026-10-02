@@ -1,0 +1,72 @@
+pack: stripe
+version: 0.1.0
+description: "Stripe payments, customers and subscriptions: revenue, refunds and subscription metrics."
+homepage: https://stripe.com
+
+variants:
+  - id: postgres
+    label: "Stripe Data Pipeline real-time sync to Postgres"
+    mapping: mappings/postgres.yaml
+    connector: postgres
+
+params:
+  - name: connection_id
+    description: "Existing canonic.yaml connection id pointing at the Postgres database Stripe syncs into."
+    required: true
+  - name: schema
+    description: "Postgres schema the Stripe pipeline writes to. Stripe uses 'stripe' unless you chose another schema."
+    default: stripe
+  - name: charges_table
+    default: charges
+  - name: customers_table
+    default: customers
+  - name: subscriptions_table
+    default: subscriptions
+  - name: currency
+    description: "ISO currency code (lowercase, as Stripe stores it) all revenue metrics are reported in. Amounts in different currencies are never summed."
+    required: true
+    choose_from:
+      query: >
+        SELECT currency AS value, count(*) AS n
+        FROM {{schema}}.{{charges_table}}
+        WHERE livemode
+        GROUP BY 1 ORDER BY 2 DESC LIMIT 20
+      allow_custom: false
+  - name: minor_unit_divisor
+    description: "Divisor from Stripe's smallest currency unit to the major unit. 100 for USD and EUR, 1 for zero-decimal currencies such as JPY."
+    default: "100"
+    validate: { pattern: '^[0-9]+$' }
+
+required_tables:            # validated against the target connection before any file is written
+  - "{{schema}}.{{charges_table}}"
+  - "{{schema}}.{{customers_table}}"
+  - "{{schema}}.{{subscriptions_table}}"
+
+provides:
+  semantics: [models/charges.yaml, models/customers.yaml, models/subscriptions.yaml]
+  contracts:
+    metrics:
+      - metrics/gross_revenue.yaml
+      - metrics/refunded_amount.yaml
+      - metrics/net_revenue.yaml
+      - metrics/refund_rate.yaml
+      - metrics/successful_payments.yaml
+      - metrics/new_customers.yaml
+      - metrics/new_subscriptions.yaml
+      - metrics/active_subscriptions.yaml
+      - metrics/trialing_subscriptions.yaml
+      - metrics/canceled_subscriptions.yaml
+    guardrails:
+      - guardrails/live-mode-charges.yaml
+      - guardrails/live-mode-customers.yaml
+      - guardrails/live-mode-subscriptions.yaml
+      - guardrails/single-currency-charges.yaml
+  knowledge:
+    - knowledge/amounts-and-currency.md
+    - knowledge/revenue-definitions.md
+    - knowledge/subscription-status.md
+    - knowledge/test-mode-and-accounts.md
+
+first_answer:
+  metric: net_revenue
+  window: 30d

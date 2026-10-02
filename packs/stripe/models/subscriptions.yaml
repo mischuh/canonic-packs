@@ -1,0 +1,47 @@
+name: stripe_subscriptions
+connection: "{{connection_id}}"
+table: "{{schema}}.{{subscriptions_table}}"
+grain: [id]
+description: "One row per Stripe subscription, from the real-time sync to Postgres. Line items live in a JSON column and are not modeled in this version."
+
+columns:
+  - { name: id,                   type: string, nullable: false }
+  - { name: _account_id,          type: string }
+  - { name: customer,             type: string }
+  - { name: status,               type: string }
+  - { name: currency,             type: string }
+  - { name: cancel_at_period_end, type: bool }
+  - { name: livemode,             type: bool }
+  - { name: created,              type: int }
+  - { name: start_date,           type: int }
+  - { name: canceled_at,          type: int }
+  - { name: ended_at,             type: int }
+
+measures:
+  - name: subscription_count
+    expr: "count(*)"
+    additivity: additive
+
+dimensions:
+  - name: subscription_start_date
+    expr: "to_timestamp(start_date) AT TIME ZONE 'UTC'"
+    type: timestamp
+    granularity: day
+    label: "Subscription Start Date (UTC)"
+  - name: canceled_date
+    expr: "to_timestamp(canceled_at) AT TIME ZONE 'UTC'"
+    type: timestamp
+    granularity: day
+    label: "Canceled Date (UTC)"
+    description: "Empty for subscriptions that were never canceled."
+  - { name: subscription_status, column: status }
+  - { name: subscription_currency, column: currency }
+  - { name: cancel_at_period_end, column: cancel_at_period_end }
+
+joins:
+  - to: stripe_customers
+    on: "stripe_subscriptions.customer = stripe_customers.id"
+    relationship: many_to_one
+
+meta:
+  provenance: human_curated

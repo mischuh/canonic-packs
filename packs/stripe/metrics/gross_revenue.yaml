@@ -1,0 +1,10 @@
+metric: gross_revenue
+label: "Gross Revenue"
+canonical:
+  kind: single
+  source: stripe_charges
+  measure: gross_amount
+  population_filter: "status = 'succeeded'"
+provenance: human_curated
+aliases: ["revenue", "gross sales", "charged amount"]
+status: active

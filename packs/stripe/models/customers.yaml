@@ -1,0 +1,28 @@
+name: stripe_customers
+connection: "{{connection_id}}"
+table: "{{schema}}.{{customers_table}}"
+grain: [id]
+description: "One row per Stripe customer, from the real-time sync to Postgres."
+
+columns:
+  - { name: id,          type: string, nullable: false }
+  - { name: _account_id, type: string }
+  - { name: created,     type: int }
+  - { name: delinquent,  type: bool }
+  - { name: livemode,    type: bool }
+
+measures:
+  - name: customer_count
+    expr: "count(*)"
+    additivity: additive
+
+dimensions:
+  - name: customer_created_date
+    expr: "to_timestamp(created) AT TIME ZONE 'UTC'"
+    type: timestamp
+    granularity: day
+    label: "Customer Created Date (UTC)"
+  - { name: customer_delinquent, column: delinquent }
+
+meta:
+  provenance: human_curated
