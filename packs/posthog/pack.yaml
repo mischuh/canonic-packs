@@ -2,6 +2,7 @@ pack: posthog
 version: 0.2.0
 description: "PostHog product analytics: events, persons, and core activation metrics."
 homepage: https://posthog.com
+min_canonic_version: "0.32.0"
 
 variants:
   - id: postgres

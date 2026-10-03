@@ -20,8 +20,8 @@ implements against.
 - `semantics/<connection_id>/ph_events.yaml`, `ph_persons.yaml` — one row per event / one row per
   `(team_id, distinct_id)`, joined many-to-one.
 - `ph_events` also exposes three keys of its `properties` column as dimensions: `current_url`,
-  `session_id` and `geoip_country_code`. They are `json_path` dimensions, so they need a canonic
-  release that supports `dimensions[].json_path`. A row without the key groups under `NULL`.
+  `session_id` and `geoip_country_code`. They are `json_path` dimensions, so the pack needs canonic
+  0.32.0 or newer (`min_canonic_version`). A row without the key groups under `NULL`.
 - `contracts/metrics/{active_users,new_users,activated_users,activation_rate}.yaml` — DAU/WAU/MAU are
   one `active_users` metric queried at different time granularities, not three separate bindings.
 - `contracts/guardrails/exclude-internal-traffic.yaml` — a `mandatory_filter` on `ph_events`,
