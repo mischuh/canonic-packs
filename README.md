@@ -26,7 +26,7 @@ Every PR runs:
 
 - **`ci.yml`** — `canonic pack validate .`, which validates every pack under `packs/*/`: manifest
   schema, `{{param}}`/token consistency, and full semantics/contracts/knowledge validation, with no
-  live database connection needed. Run it locally with `uvx --from canonic==0.31.0 canonic pack
+  live database connection needed. Run it locally with `uvx --from canonic==0.32.0 canonic pack
   validate .` (or `uvx canonic pack validate .` for the latest release).
 - **`commitlint.yml`** / **`pr-title-lint.yml`** — commit messages and the PR title (used as the
   squash-merge commit message) must follow [Conventional Commits](https://www.conventionalcommits.org/).

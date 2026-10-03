@@ -25,6 +25,26 @@ dimensions:
   - { name: team_id,     column: team_id }
   - { name: event_date,  column: timestamp, granularity: day, label: "Event Date" }
 
+  # Keys inside the json `properties` column. A row without the key gives NULL.
+  - name: current_url
+    column: properties
+    json_path: ["$current_url"]
+    type: string
+    label: "Current URL"
+    description: "Full URL of the page the event happened on (PostHog's $current_url property). Pageview and autocapture events set it, server-side events usually do not."
+  - name: session_id
+    column: properties
+    json_path: ["$session_id"]
+    type: string
+    label: "Session ID"
+    description: "PostHog session the event belongs to (the $session_id property). Missing on events from SDKs or server-side libraries that do not track sessions."
+  - name: geoip_country_code
+    column: properties
+    json_path: ["$geoip_country_code"]
+    type: string
+    label: "Country Code"
+    description: "Two-letter country code resolved from the client IP (the $geoip_country_code property). Missing when GeoIP is disabled for the project."
+
 joins:
   - to: ph_persons
     on: "ph_events.distinct_id = ph_persons.distinct_id AND ph_events.team_id = ph_persons.team_id"
