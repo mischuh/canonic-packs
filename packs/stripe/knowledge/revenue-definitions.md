@@ -27,13 +27,29 @@ made, not the day the refund was issued. Net revenue for last month therefore ch
 from last month is refunded next week. This keeps net revenue consistent with gross revenue of the
 same period, which a refund-date view would not.
 
-## Refunds by refund date
+## Which refund metric to use
 
-Use `refunds_issued` when the question is "how much did we refund in March", whatever month the
-original charges are from. To see both views for a month, query `gross_revenue` and `refunds_issued`
-side by side grouped by month. The two do not add up to `net_revenue` for a single month, because
-`net_revenue` subtracts refunds in the month of the charge. A refund counts only if its refunded
-charge is in live mode, because the refunds table has no `livemode` column of its own.
+The refund metrics answer different questions, so two of them can differ for the same period and
+both be correct.
+
+| question | metric | refund is counted on |
+| --- | --- | --- |
+| How much of what we charged in March was refunded? | `refunded_amount`, `refund_rate`, `net_revenue` | the charge date |
+| How much money did we refund in March? | `refunds_issued` | the refund date |
+
+A charge from February that is refunded in March is in `refunds_issued` for March and in
+`refunded_amount` for February. When you show both for one period, say which is which. Do not
+subtract `refunds_issued` from `net_revenue`, that counts the refund twice.
+
+To compare per month, query `gross_revenue` and `refunds_issued` side by side grouped by month.
+
+## Which refunds are included
+
+`refunds_issued` counts succeeded refunds in the chosen currency. The refunds table has no
+`livemode` column, so test mode refunds are removed through the refunded charge. A refund with no
+charge, which happens when it is linked only to a payment intent, cannot be classified and is
+kept. `refunded_amount` never sees such a refund, because it reads `amount_refunded` on charges, so
+`refunds_issued` can be higher than `refunded_amount` over the same period for that reason too.
 
 ## Why net revenue differs from the Stripe dashboard
 

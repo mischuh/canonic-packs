@@ -1,5 +1,5 @@
 pack: stripe
-version: 0.1.0
+version: 0.1.1
 description: "Stripe payments, customers and subscriptions: revenue, refunds and subscription metrics."
 homepage: https://stripe.com
 
