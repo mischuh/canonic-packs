@@ -1,0 +1,42 @@
+name: stripe_refunds
+connection: "{{connection_id}}"
+table: "{{schema}}.{{refunds_table}}"
+grain: [id]
+description: "One row per Stripe refund, from the real-time sync to Postgres. Amounts are in the currency's smallest unit. The table has no livemode column, so live mode is taken from the refunded charge."
+
+columns:
+  - { name: id,          type: string, nullable: false }
+  - { name: _account_id, type: string }
+  - { name: amount,      type: int }
+  - { name: charge,      type: string }
+  - { name: currency,    type: string }
+  - { name: status,      type: string }
+  - { name: reason,      type: string }
+  - { name: created,     type: int }
+
+measures:
+  - name: refund_amount_total
+    expr: "sum(amount) / {{minor_unit_divisor}}.0"
+    additivity: additive
+  - name: refund_count
+    expr: "count(*)"
+    additivity: additive
+
+dimensions:
+  - name: refund_date
+    expr: "to_timestamp(created) AT TIME ZONE 'UTC'"
+    type: timestamp
+    granularity: day
+    label: "Refund Date (UTC)"
+    description: "When the refund was issued, not when the original charge was made."
+  - { name: refund_status, column: status }
+  - { name: refund_reason, column: reason }
+  - { name: refund_currency, column: currency }
+
+joins:
+  - to: stripe_charges
+    on: "stripe_refunds.charge = stripe_charges.id"
+    relationship: many_to_one
+
+meta:
+  provenance: human_curated

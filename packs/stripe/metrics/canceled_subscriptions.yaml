@@ -1,0 +1,10 @@
+metric: canceled_subscriptions
+label: "Canceled Subscriptions"
+canonical:
+  kind: single
+  source: stripe_subscriptions
+  measure: subscription_count
+  population_filter: "status = 'canceled'"
+provenance: human_curated
+aliases: ["churned subscriptions", "subscription churn"]
+status: active

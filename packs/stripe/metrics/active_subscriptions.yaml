@@ -1,0 +1,10 @@
+metric: active_subscriptions
+label: "Active Subscriptions"
+canonical:
+  kind: single
+  source: stripe_subscriptions
+  measure: subscription_count
+  population_filter: "status IN ('active', 'past_due')"
+provenance: human_curated
+aliases: ["paying subscriptions", "active subs"]
+status: active

@@ -1,0 +1,52 @@
+name: stripe_charges
+connection: "{{connection_id}}"
+table: "{{schema}}.{{charges_table}}"
+grain: [id]
+description: "One row per Stripe charge, from the real-time sync to Postgres. Amounts are in the currency's smallest unit."
+
+columns:
+  - { name: id,              type: string, nullable: false }
+  - { name: _account_id,     type: string }
+  - { name: amount,          type: int }
+  - { name: amount_refunded, type: int }
+  - { name: currency,        type: string }
+  - { name: customer,        type: string }
+  - { name: status,          type: string }
+  - { name: paid,            type: bool }
+  - { name: refunded,        type: bool }
+  - { name: disputed,        type: bool }
+  - { name: livemode,        type: bool }
+  - { name: created,         type: int }
+
+measures:
+  - name: gross_amount
+    expr: "sum(amount) / {{minor_unit_divisor}}.0"
+    additivity: additive
+  - name: refunded_amount_total
+    expr: "sum(amount_refunded) / {{minor_unit_divisor}}.0"
+    additivity: additive
+  - name: net_amount
+    expr: "sum(amount - amount_refunded) / {{minor_unit_divisor}}.0"
+    additivity: additive
+  - name: charge_count
+    expr: "count(*)"
+    additivity: additive
+
+dimensions:
+  - name: charge_date
+    expr: "to_timestamp(created) AT TIME ZONE 'UTC'"
+    type: timestamp
+    granularity: day
+    label: "Charge Date (UTC)"
+  - { name: currency,       column: currency }
+  - { name: charge_status,  column: status }
+  - { name: disputed,       column: disputed }
+  - { name: stripe_account, column: _account_id }
+
+joins:
+  - to: stripe_customers
+    on: "stripe_charges.customer = stripe_customers.id"
+    relationship: many_to_one
+
+meta:
+  provenance: human_curated

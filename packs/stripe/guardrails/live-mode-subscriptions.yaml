@@ -1,0 +1,7 @@
+id: stripe-live-mode-subscriptions
+applies_to: { source: stripe_subscriptions }
+kind: mandatory_filter
+filter: "livemode = true"
+severity: warn
+rationale: "Test mode and sandbox objects are not real business activity. Remove this filter only if you want to analyze a sandbox."
+phase: P1

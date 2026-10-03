@@ -1,0 +1,9 @@
+metric: new_customers
+label: "New Customers"
+canonical:
+  kind: single
+  source: stripe_customers
+  measure: customer_count
+provenance: human_curated
+aliases: ["customers created", "new stripe customers"]
+status: active

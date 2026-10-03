@@ -6,10 +6,11 @@ on:
   pull_request:
 
 env:
-  # The first canonic release containing `canonic pack validate` (PR #335, released as
-  # 0.29.0). Bump by hand in a follow-up PR when a newer canonic release matters to pack
+  # The first canonic release containing `canonic pack validate` was 0.29.0 (PR #335).
+  # 0.31.0 is the first with `dimensions[].expr` (PR #351), which the stripe pack needs.
+  # Bump by hand in a follow-up PR when a newer canonic release matters to pack
   # validation — this is a normal version pin, not a workaround.
-  CANONIC_VERSION: "0.29.0"
+  CANONIC_VERSION: "0.31.0"
 
 jobs:
   validate:

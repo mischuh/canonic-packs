@@ -1,0 +1,7 @@
+id: stripe-single-currency-charges
+applies_to: { source: stripe_charges }
+kind: mandatory_filter
+filter: "currency = '{{currency}}'"
+severity: warn
+rationale: "Charges in different currencies must not be summed. Revenue is reported in one currency, chosen at install."
+phase: P1

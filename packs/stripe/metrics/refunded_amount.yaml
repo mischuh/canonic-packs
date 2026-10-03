@@ -1,0 +1,10 @@
+metric: refunded_amount
+label: "Refunded Amount"
+canonical:
+  kind: single
+  source: stripe_charges
+  measure: refunded_amount_total
+  population_filter: "status = 'succeeded'"
+provenance: human_curated
+aliases: ["refunds"]
+status: active
