@@ -19,6 +19,9 @@ implements against.
 
 - `semantics/<connection_id>/ph_events.yaml`, `ph_persons.yaml` — one row per event / one row per
   `(team_id, distinct_id)`, joined many-to-one.
+- `ph_events` also exposes three keys of its `properties` column as dimensions: `current_url`,
+  `session_id` and `geoip_country_code`. They are `json_path` dimensions, so they need a canonic
+  release that supports `dimensions[].json_path`. A row without the key groups under `NULL`.
 - `contracts/metrics/{active_users,new_users,activated_users,activation_rate}.yaml` — DAU/WAU/MAU are
   one `active_users` metric queried at different time granularities, not three separate bindings.
 - `contracts/guardrails/exclude-internal-traffic.yaml` — a `mandatory_filter` on `ph_events`,
@@ -39,8 +42,9 @@ implements against.
 
 ## Not in v1 (see the open questions in the amendment for the full list)
 
-- JSON-derived dimensions (`$current_url`, `$session_id`, `$geoip_country_code`, …) — needs
-  `dimensions[].expr` (a separate, not-yet-shipped amendment).
+- Further JSON-derived dimensions (`$pathname`, `$browser`, `$referring_domain`, and any custom event
+  property) and anything inside `person_properties`. Each is one more `json_path` entry in
+  `models/events.yaml`.
 - A sessions model — PostHog's sessions batch export has no fixed, documented column list.
 - Retention (cohort week-over-week) — not expressible as a single metric binding; likely a curated
   report, not a `contracts/metrics/` binding.

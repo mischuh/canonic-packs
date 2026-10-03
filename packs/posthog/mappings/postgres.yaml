@@ -30,4 +30,4 @@ tables:
 
 notes:
   - "Schema is fixed and documented by PostHog (see docs link above) — no speculative columns."
-  - "properties/person_properties are typed json and left opaque in v1 (see knowledge/internal-traffic-caveat.md and the pack README's follow-up notes)."
+  - "properties is typed json. $current_url, $session_id and $geoip_country_code are exposed as json_path dimensions in models/events.yaml. person_properties stays opaque."
