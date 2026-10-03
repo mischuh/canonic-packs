@@ -20,6 +20,12 @@ tables:
     default_name: customers
     grain: [id]
     columns: [id, _account_id, created, delinquent, livemode]
+  refunds:
+    param: refunds_table
+    default_name: refunds
+    grain: [id]
+    columns: [id, _account_id, amount, charge, currency, status, reason, created]
+    notes: "No livemode column. Live mode is read from the refunded charge through the join."
   subscriptions:
     param: subscriptions_table
     default_name: subscriptions

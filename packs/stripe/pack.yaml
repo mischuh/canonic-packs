@@ -20,6 +20,8 @@ params:
     default: charges
   - name: customers_table
     default: customers
+  - name: refunds_table
+    default: refunds
   - name: subscriptions_table
     default: subscriptions
   - name: currency
@@ -40,16 +42,18 @@ params:
 required_tables:            # validated against the target connection before any file is written
   - "{{schema}}.{{charges_table}}"
   - "{{schema}}.{{customers_table}}"
+  - "{{schema}}.{{refunds_table}}"
   - "{{schema}}.{{subscriptions_table}}"
 
 provides:
-  semantics: [models/charges.yaml, models/customers.yaml, models/subscriptions.yaml]
+  semantics: [models/charges.yaml, models/customers.yaml, models/subscriptions.yaml, models/refunds.yaml]
   contracts:
     metrics:
       - metrics/gross_revenue.yaml
       - metrics/refunded_amount.yaml
       - metrics/net_revenue.yaml
       - metrics/refund_rate.yaml
+      - metrics/refunds_issued.yaml
       - metrics/successful_payments.yaml
       - metrics/new_customers.yaml
       - metrics/new_subscriptions.yaml
@@ -61,6 +65,8 @@ provides:
       - guardrails/live-mode-customers.yaml
       - guardrails/live-mode-subscriptions.yaml
       - guardrails/single-currency-charges.yaml
+      - guardrails/live-mode-refunds.yaml
+      - guardrails/single-currency-refunds.yaml
   knowledge:
     - knowledge/amounts-and-currency.md
     - knowledge/revenue-definitions.md

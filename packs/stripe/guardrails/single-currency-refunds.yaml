@@ -1,0 +1,7 @@
+id: stripe-single-currency-refunds
+applies_to: { source: stripe_refunds }
+kind: mandatory_filter
+filter: "refund_currency = '{{currency}}'"
+severity: warn
+rationale: "Refunds in different currencies must not be summed. Refunds are reported in one currency, chosen at install."
+phase: P1
