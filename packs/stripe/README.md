@@ -93,5 +93,19 @@ FROM stripe.subscriptions s,
 ```
 
 A `sum(monthly_amount) / 100.0` measure over this view, filtered to `status IN ('active',
-'past_due')`, `livemode` and one currency, is the current MRR. Trials are excluded, discounts are
-not applied.
+'past_due')`, `livemode` and one currency, is the current MRR.
+
+What this view covers and what it does not:
+
+- **Covered:** several items per subscription, `quantity`, and yearly, weekly and daily prices
+  normalised to a month (`interval_count` is respected). Verified only against the seeded demo
+  database in `scripts/stripe_pack_demo`, where it returns 105.00.
+- **Status:** `active` and `past_due` count, matching `active_subscriptions`. `trialing` is left
+  out. `paused` and `incomplete` are left out as well, whether your definition wants them is your call.
+- **Not covered:** discounts and coupons, taxes, usage-based or metered prices (`unit_amount` is
+  null for tiered prices, so those items are missing from the sum), a price that is not recurring, and
+  subscriptions that end at the period end.
+- **Currency:** one currency per query. Convert nothing, filter to one.
+- **Unverified:** the shape of `items` comes from the Stripe API object. The mechanics are tested,
+  but the definition has not been compared against a real account, so reconcile it with your
+  billing numbers before relying on it.

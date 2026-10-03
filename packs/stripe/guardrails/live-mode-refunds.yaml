@@ -1,7 +1,7 @@
 id: stripe-live-mode-refunds
 applies_to: { source: stripe_refunds }
 kind: mandatory_filter
-filter: "stripe_charges.livemode = true"
+filter: "coalesce(stripe_charges.livemode, true) = true"
 severity: warn
-rationale: "Test mode and sandbox objects are not real business activity. The refunds table has no livemode column, so this reads it from the refunded charge. Remove this filter only if you want to analyze a sandbox."
+rationale: "Test mode and sandbox objects are not real business activity. The refunds table has no livemode column, so this reads it from the refunded charge. A refund with no charge (linked only to a payment intent) cannot be classified and is kept. Remove this filter only if you want to analyze a sandbox."
 phase: P1
