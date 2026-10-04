@@ -1,5 +1,5 @@
 pack: posthog
-version: 0.3.0
+version: 0.3.1
 description: "PostHog product analytics: events, persons, and core activation metrics."
 homepage: https://posthog.com
 min_canonic_version: "0.33.0"
@@ -35,7 +35,7 @@ variants:
       - name: team_id
         description: "Numeric id of the PostHog project (team_id) to analyze. The events table holds every project of the instance."
         required: true
-        validate: { pattern: '^[0-9A-Za-z_]+$' }   # a plain id, nothing that could change the SQL it is placed in
+        validate: { pattern: '^[0-9]+$' }
       - name: signup_event
         description: "Event name marking a new signup (used to define new_users)."
         required: true
