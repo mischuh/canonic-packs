@@ -1,0 +1,7 @@
+id: posthog-team-scope
+applies_to: { source: ph_events }
+kind: mandatory_filter
+filter: "team_id = {{team_id}}"
+severity: warn
+rationale: "A PostHog ClickHouse database holds the events of every project (team) in the instance. Without this filter every metric adds up all projects. Remove it only if the instance has a single project."
+phase: P1

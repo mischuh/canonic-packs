@@ -1,0 +1,52 @@
+name: ph_events
+connection: "{{connection_id}}"
+table: "{{schema}}.{{events_table}}"
+grain: [uuid]
+description: "One row per PostHog event, from the events table of a PostHog ClickHouse database. The table holds the events of every project (team) in the instance, so queries are scoped to one team_id by a guardrail."
+
+columns:
+  - { name: uuid,               type: string,    nullable: false }
+  - { name: event,              type: string,    nullable: false }
+  - { name: properties,         type: json,      nullable: true }
+  - { name: person_properties,  type: json,      nullable: true }
+  - { name: distinct_id,        type: string,    nullable: false }
+  - { name: team_id,            type: int,       nullable: false }
+  - { name: person_id,          type: string,    nullable: false }
+  - { name: timestamp,          type: timestamp, nullable: false }
+
+measures:
+  - name: event_count
+    expr: "count(*)"
+    additivity: additive
+
+dimensions:
+  - { name: event_name, column: event }
+  - { name: distinct_id, column: distinct_id }
+  - { name: team_id,     column: team_id }
+  - { name: person_id,   column: person_id }
+  - { name: event_date,  column: timestamp, granularity: day, label: "Event Date" }
+
+  # Keys inside the properties column. PostHog stores it as a String that holds JSON text.
+  # A row without the key gives an empty string, not NULL, because ClickHouse returns ''
+  # for a missing key.
+  - name: current_url
+    column: properties
+    json_path: ["$current_url"]
+    type: string
+    label: "Current URL"
+    description: "Full URL of the page the event happened on (PostHog's $current_url property). Pageview and autocapture events set it, server-side events usually do not."
+  - name: session_id
+    column: properties
+    json_path: ["$session_id"]
+    type: string
+    label: "Session ID"
+    description: "PostHog session the event belongs to (the $session_id property). Missing on events from SDKs or server-side libraries that do not track sessions."
+  - name: geoip_country_code
+    column: properties
+    json_path: ["$geoip_country_code"]
+    type: string
+    label: "Country Code"
+    description: "Two-letter country code resolved from the client IP (the $geoip_country_code property). Missing when GeoIP is disabled for the project."
+
+meta:
+  provenance: human_curated
