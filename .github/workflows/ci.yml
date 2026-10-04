@@ -10,9 +10,11 @@ env:
   # 0.31.0 is the first with `dimensions[].expr` (PR #351), which the stripe pack needs.
   # 0.32.0 is the first with `dimensions[].json_path` and `min_canonic_version`, which the
   # posthog pack needs. Older releases ignore both fields and would validate the pack anyway.
+  # 0.33.0 is the first with variant-level `provides`, `required_tables` and `params`, which the
+  # posthog pack needs for its clickhouse variant. Older releases reject the manifest.
   # Bump by hand in a follow-up PR when a newer canonic release matters to pack
   # validation — this is a normal version pin, not a workaround.
-  CANONIC_VERSION: "0.32.0"
+  CANONIC_VERSION: "0.33.0"
 
 jobs:
   validate:

@@ -1,0 +1,23 @@
+# Variant metadata for "PostHog ClickHouse database (self-hosted)" (pack.yaml variants[].mapping).
+#
+# Not templated and not emitted into a project. It documents which physical schema this
+# variant targets, for maintainers and for anyone diffing another variant against it. The
+# column list is declared as the source of truth in models/clickhouse/events.yaml.
+
+source: "PostHog's own ClickHouse database, as defined in PostHog's source (posthog/models/event/sql.py)"
+docs: https://posthog.com/handbook/engineering/clickhouse/schema/sharded-events
+
+tables:
+  events:
+    param: events_table
+    default_name: events
+    grain: [uuid]
+    columns: [uuid, event, properties, person_properties, distinct_id, team_id, person_id, timestamp]
+
+notes:
+  - "This is PostHog's internal schema, not a published interface. It was read from PostHog's source in October 2026 and has not been checked against a running instance."
+  - "events is the Distributed table over sharded_events. The engine is ReplacingMergeTree(_timestamp), so duplicates can exist until parts merge. Distinct-user metrics are not affected."
+  - "properties and person_properties are String columns that hold JSON text. PostHog has an unmerged change that moves properties to a native JSON type."
+  - "The table holds every project of the instance, so the pack scopes queries to one team_id with a guardrail."
+  - "The default database is 'default' (CLICKHOUSE_DATABASE in PostHog's settings)."
+  - "Persons are not modeled. The person and person_distinct_id2 tables are ReplacingMergeTree tables that need FINAL or argMax, and a semantic source can only point at a table or view."
